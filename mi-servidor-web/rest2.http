@@ -1,0 +1,7 @@
+GET http://localhost:3000/aula/100
+content-type: application/json;
+
+Send Request
+GET http://localhost:3000/aula/1
+content-type: application/json
+

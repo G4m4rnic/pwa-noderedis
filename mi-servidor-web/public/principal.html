@@ -1,0 +1,308 @@
+<html>
+
+<head>
+    <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+    <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/js/bootstrap.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script type="text/javascript">
+        const nuevaCursada = async() => {
+            console.log('hola: ', document.getElementById('inputmateria').value)
+            const response = await fetch('http://localhost:3000/nueva_cursada', {
+                method: 'POST',
+                body: JSON.stringify({
+                    "mat": document.getElementById('inputmateria').value,
+                    "ins": document.getElementById('inputinscriptos').value,
+                    "tur": document.getElementById('inputturno').value,
+                    "car": document.getElementById('inputcarrera').value,
+                    "aul": localStorage.getItem("comboSel")
+                }),
+                headers: {
+                    'content-type': 'application/json'
+                }
+            })
+        }
+
+        const aulasKeys = async() => {
+
+            var listaPositiva = 0;
+
+            console.log('Aulas: ', "buscar aulas");
+
+            const response = await fetch('http://localhost:3000/aulas_keys', {
+                method: 'GET',
+                /* body: JSON.stringify({
+
+
+                 }),*/
+                headers: {
+                    'content-type': 'application/json'
+                }
+
+
+
+            })
+            var content = await response.json();
+            var content2;
+            content.results.forEach(function(element) {
+
+                try {
+                    const aula = async() => {
+                        console.log('Aula: ', "busca aula")
+                        const responseAula = await fetch('http://localhost:3000/aula/' +
+                            element, {
+                                method: 'GET',
+                                /* body: JSON.stringify({
+
+
+                                 }),*/
+                                headers: {
+                                    'content-type': 'application/json'
+                                }
+
+
+
+                            })
+                        content2 = await responseAula.json();
+                        if (content2.disponibilidad === "true") {
+                            listaPositiva = listaPositiva + 1;
+                            var aulasCombo = document.getElementById("aulasCombo");
+                            console.log("id " + element)
+                            console.log("capacidad " + content2.capacidad)
+
+
+
+                            var oldList = [];
+                            var obj = {
+                                id: element,
+                                capacidad: content2.capacidad
+                            };
+                            var myJSON = JSON.stringify(obj);
+
+                            var oldList = JSON.parse(localStorage.getItem('combo'));
+
+                            console.log('nico: ', oldList);
+                            oldList.push(obj);
+                            var myJSON = JSON.stringify(oldList);
+                            localStorage.setItem("combo", myJSON);
+
+                            var option = document.createElement("option");
+
+                            //Set Customer Name in Text part.
+
+                            option.innerHTML = String("Aula " + element);
+
+                            //Set CustomerId in Value part.
+
+                            option.value = String(content2.capacidad);
+
+                            //Add the Option element to DropDownList.
+                            aulasCombo.add(option);
+                            console.log("ls", listaPositiva);
+                            localStorage.setItem("comboTope", listaPositiva);
+                            //localStorage.getItem("listaCompleta");
+
+
+                        }
+
+
+
+                    }
+
+                    aula()
+                } catch (e) {
+                    console.log(e); // 30
+                }
+            });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        }
+
+        function borrarLista() {
+            var aulasCombo = document.getElementById("aulasCombo");
+            if (aulasCombo != null) {
+                var length = aulasCombo.options.length;
+                for (i = 0; i < length; i++) {
+                    aulasCombo.remove(aulasCombo[i]);
+                    aulasCombo.options[i] = null;
+
+                }
+            }
+        }
+
+        aulasKeys();
+
+
+
+
+        function filtrarCupos(inscriptos) {
+            var oldList = JSON.parse(localStorage.getItem('combo'));
+            console.log(oldList.length);
+            console.log(oldList);
+            var newList = [];
+
+            for (i = 0; i < oldList.length; i++) {
+                console.log(oldList[i]);
+                if (parseInt(oldList[i].capacidad) > parseInt(inscriptos)) {
+                    console.log(oldList[i].capacidad, " deberia estar");
+                    newList.push(oldList[i]);
+                } else {
+                    console.log(oldList[i].capacidad, " deberia borrarse");
+
+                }
+
+
+            }
+            console.log("popular lista", newList)
+            popularCombo(newList);
+
+
+
+
+
+        }
+
+        function popularCombo(lista) {
+            var aulasCombo = document.getElementById("aulasCombo");
+            borrarLista();
+
+            console.log("populando", lista.length);
+
+            for (i = 0; i < lista.length; i++) {
+
+                var option = document.createElement("option");
+                option.innerHTML = String("Aula " + lista[i].id);
+                //Set CustomerId in Value part.
+                option.value = lista[i].capacidad;
+                //Add the Option element to DropDownList.
+                console.log(option)
+                aulasCombo.add(option);
+                if (i == 0) {
+                    localStorage.setItem("comboSel", String("Aula " + lista[i].id))
+                        //Set Customer Name in Text part.
+                }
+            }
+
+
+
+        }
+    </script>
+
+</head>
+
+<body>
+
+    <div class="container">
+        <table class="table table-striped">
+            <tbody>
+                <tr>
+                    <td colspan="1">
+                        <form class="well form-horizontal">
+                            <fieldset>
+                                <div class="form-group">
+                                    <label class="col-md-4 control-label">Carrera</label>
+                                    <div class="col-md-8 inputGroupContainer">
+                                        <div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-home"></i></span><input id="inputcarrera" name="carrera" placeholder="Carrera" class="form-control" required="true" value="" type="text"></div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-md-4 control-label">Materia</label>
+                                    <div class="col-md-8 inputGroupContainer">
+                                        <div class="input-group">
+                                            <span class="input-group-addon" style="max-width: 100%;"><i class="glyphicon glyphicon-list"></i></span>
+                                            <select class="selectpicker form-control" id="inputmateria">
+                                                  <option value=1>Matematica</option>
+                                                  <option value=2>PWA</option>
+                                                  <option value=3>Metodologias de desarrollo</option>
+                                                  <option value=4>Diseño y arquitectura de software</option>
+                                                  <option value=5>Auditoria</option>
+                                                  <option value=6>Logica</option>
+                                               </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-md-4 control-label">Turno</label>
+                                    <div class="col-md-8 inputGroupContainer">
+                                        <div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-home"></i></span><input id="inputturno" name="turno" placeholder="Turno" class="form-control" required="true" value="" type="text"></div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-md-4 control-label">Comision</label>
+                                    <div class="col-md-8 inputGroupContainer">
+                                        <div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-home"></i></span><input id="inputcomision" name="comision" placeholder="Comision" class="form-control" required="true" value="" type="text"></div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-md-4 control-label">Inscriptos</label>
+                                    <div class="col-md-8 inputGroupContainer">
+                                        <div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-home"></i></span><input id="inputinscriptos" name="inscriptos" placeholder="Inscriptos" class="form-control" required="true" value="" type="text" onchange=filtrarCupos(this.value)></div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-md-8 inputGroupContainer">
+                                        <button class="btn btn-primary get_map" onclick=nuevaCursada()>
+                                            cargar
+                                        </button>
+                                    </div>
+                                </div>
+                            </fieldset>
+                        </form>
+
+                    </td>
+                    <td colspan="1">
+                        <form class="well form-horizontal">
+                            <fieldset>
+                                <div class="form-group">
+                                    <label class="col-md-4 control-label">Aulas</label>
+                                    <div class="col-md-8 inputGroupContainer">
+                                        <div class="input-group">
+                                            <span class="input-group-addon" style="max-width: 100%;"><i class="glyphicon glyphicon-list"></i></span>
+                                            <select class="selectpicker form-control" name="aula" id="aulasCombo" onchange=guardarSeleccion(this)>
+                                                
+                                             </select>
+                                            <script>
+                                            </script>
+                                        </div>
+                                    </div>
+                            </fieldset>
+                        </form>
+                    </td>
+                </tr>
+
+            </tbody>
+        </table>
+        </div>
+
+</body>
+<footer class="page-footer font-small blue">
+
+    <!-- Copyright -->
+    <div class="footer-copyright text-center py-3">© 2019 Copyright:
+        <a>Universidad Abierta Interamericana</a>
+    </div>
+    <!-- Copyright -->
+
+</footer>
+<script>
+    localStorage.setItem("combo", "[]");
+    console.log("inicie", document.getElementById("aulasCombo"))
+
+    function guardarSeleccion(sel) {
+        console.log("wer");
+        localStorage.setItem("comboSel", sel.options[sel.selectedIndex].text);
+    }
+</script>
+
+</html>

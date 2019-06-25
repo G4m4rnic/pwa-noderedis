@@ -1,0 +1,22 @@
+{
+  "name": "pwa-noderedis",
+  "version": "1.0.0",
+  "description": "",
+  "main": "apps.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/G4m4rnic/pwa-noderedis.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/G4m4rnic/pwa-noderedis/issues"
+  },
+  "homepage": "https://github.com/G4m4rnic/pwa-noderedis#readme",
+  "dependencies": {
+    "redis": "^2.8.0"
+  }
+}

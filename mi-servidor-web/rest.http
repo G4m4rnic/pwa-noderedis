@@ -1,0 +1,9 @@
+POST http://localhost:3000/nueva_cursada
+content-type: application/json
+
+{
+    "mat" : "Matematica",
+    "ins" : 1 ,
+    "tur" : "Noche" // document.getElementById(inputturno).value;
+    "car" : "Ingenieria" 
+}
